@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic from "@anthropic-ai/sdk";
 
 const prompt = `
 You are a bank assistant.
@@ -21,7 +21,7 @@ Answer this with ONLY a structured json of a given interface below,
 "starting-balance": number,
 "ending balance": number,
 }
-`
+`;
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -32,27 +32,27 @@ export async function POST(request: Request) {
   const base64 = data.payload;
 
   const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: "claude-sonnet-4-20250514",
     max_tokens: 4000,
     messages: [
       {
-        role: 'user',
+        role: "user",
         content: [
           {
-            type: 'document',
+            type: "document",
             source: {
-              type: 'base64',
-              media_type: 'application/pdf',
-              data: base64
-            }
+              type: "base64",
+              media_type: "application/pdf",
+              data: base64,
+            },
           },
           {
-            type: 'text',
+            type: "text",
             text: prompt,
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   });
   const jsonstring = (message.content[0] as any).text;
   return NextResponse.json(JSON.parse(jsonstring), { status: 200 });

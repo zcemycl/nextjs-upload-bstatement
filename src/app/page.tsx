@@ -7,22 +7,21 @@ function fileToBase64(file: File) {
     reader.readAsDataURL(file);
     reader.onload = () => {
       // Remove the data URL prefix (data:application/pdf;base64,)
-      const base64 = (reader.result! as string).split(',')[1];
+      const base64 = (reader.result! as string).split(",")[1];
       resolve(base64);
     };
-    reader.onerror = error => reject(error);
+    reader.onerror = (error) => reject(error);
   });
 }
 
 interface IContent {
-  name: string,
-  address: string,
-  date: string,
-  transactions: string[],
-  "starting-balance": number,
-  "ending-balance": number,
+  name: string;
+  address: string;
+  date: string;
+  transactions: string[];
+  "starting-balance": number;
+  "ending-balance": number;
 }
-
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -70,7 +69,7 @@ export default function Home() {
           onClick={async (e) => {
             e.preventDefault();
             const base64 = await fileToBase64(file as File);
-            const resp = await fetch('/api/claude/sonnet4', {
+            const resp = await fetch("/api/claude/sonnet4", {
               method: "POST",
               body: JSON.stringify({
                 payload: base64,
@@ -86,9 +85,7 @@ export default function Home() {
         >
           Submit
         </button>
-        {
-          content !== null && (<div>{JSON.stringify(content)}</div>)
-        }
+        {content !== null && <div>{JSON.stringify(content)}</div>}
       </div>
     </div>
   );
