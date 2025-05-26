@@ -3,19 +3,23 @@ import { IClaudeResponse } from "@/types";
 import { fileToBase64 } from "@/utils";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
-  region: 'eu-west-2', // replace with your region
-  endpoint: 'http://localhost:9000', // 👈 Your MinIO server URL
-  forcePathStyle: true,   
+  region: "eu-west-2", // replace with your region
+  endpoint: "http://localhost:9000", // 👈 Your MinIO server URL
+  forcePathStyle: true,
   credentials: {
     accessKeyId: "minioadmin",
     secretAccessKey: "minioadmin",
   },
 });
 
-export async function uploadJsonToS3(payload: string, bucket: string, key: string) {
+export async function uploadJsonToS3(
+  payload: string,
+  bucket: string,
+  key: string,
+) {
   const uploadParams = {
     Bucket: bucket,
     Key: key, // e.g. 'reports/my-report.pdf'
@@ -25,33 +29,37 @@ export async function uploadJsonToS3(payload: string, bucket: string, key: strin
   const command = new PutObjectCommand(uploadParams);
   try {
     const response = await s3.send(command);
-    console.log('Upload successful:', response);
+    console.log("Upload successful:", response);
     return response;
   } catch (err) {
-    console.error('Error uploading file:', err);
+    console.error("Error uploading file:", err);
     throw err;
   }
 }
 
-export async function uploadPdfToS3(base64Data: string, bucket: string, key: string) {
+export async function uploadPdfToS3(
+  base64Data: string,
+  bucket: string,
+  key: string,
+) {
   // Convert to Buffer
-  const pdfBuffer = Buffer.from(base64Data, 'base64');
+  const pdfBuffer = Buffer.from(base64Data, "base64");
 
   const uploadParams = {
     Bucket: bucket,
     Key: key, // e.g. 'reports/my-report.pdf'
     Body: pdfBuffer,
-    ContentType: 'application/pdf',
-    ContentEncoding: 'base64',
+    ContentType: "application/pdf",
+    ContentEncoding: "base64",
   };
 
   const command = new PutObjectCommand(uploadParams);
   try {
     const response = await s3.send(command);
-    console.log('Upload successful:', response);
+    console.log("Upload successful:", response);
     return response;
   } catch (err) {
-    console.error('Error uploading file:', err);
+    console.error("Error uploading file:", err);
     throw err;
   }
 }
@@ -108,9 +116,9 @@ export default function Home() {
             await uploadPdfToS3(
               base64 as string,
               "my-bucket",
-              `${myuuid}/document.pdf`
-            ) 
-           
+              `${myuuid}/document.pdf`,
+            );
+
             const resp = await fetch("/api/claude/sonnet4", {
               method: "POST",
               body: JSON.stringify({
@@ -124,10 +132,10 @@ export default function Home() {
             setContent(payload as IClaudeResponse);
             console.log(payload);
             await uploadJsonToS3(
-              payload, 
+              payload,
               "my-bucket",
-              `${myuuid}/content.json`
-            )
+              `${myuuid}/content.json`,
+            );
           }}
         >
           Submit
