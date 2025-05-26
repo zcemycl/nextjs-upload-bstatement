@@ -2,13 +2,13 @@
 import { IClaudeResponse } from "@/types";
 import { fileToBase64 } from "@/utils";
 import { useState } from "react";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [content, setContent] = useState<IClaudeResponse | null>(null);
   const myuuid = uuidv4();
-  
+
   return (
     <div
       className="w-screen h-screen 
@@ -51,7 +51,7 @@ export default function Home() {
           ${file !== null ? "scale-y-100" : "scale-y-0"}`}
           onClick={async (e) => {
             e.preventDefault();
-            console.log(myuuid)
+            console.log(myuuid);
             const base64 = await fileToBase64(file as File);
             const resp = await fetch("/api/claude/sonnet4", {
               method: "POST",
