@@ -1,4 +1,5 @@
 "use client";
+import { IClaudeResponse } from "@/types";
 import { useState } from "react";
 
 function fileToBase64(file: File) {
@@ -14,18 +15,9 @@ function fileToBase64(file: File) {
   });
 }
 
-interface IContent {
-  name: string;
-  address: string;
-  date: string;
-  transactions: string[];
-  "starting-balance": number;
-  "ending-balance": number;
-}
-
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
-  const [content, setContent] = useState<IContent | null>(null);
+  const [content, setContent] = useState<IClaudeResponse | null>(null);
   return (
     <div
       className="w-screen h-screen 
@@ -79,7 +71,7 @@ export default function Home() {
               },
             });
             const payload = await resp.json();
-            setContent(payload as IContent);
+            setContent(payload as IClaudeResponse);
             console.log(payload);
           }}
         >
