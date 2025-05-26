@@ -17,7 +17,7 @@ export default function Home() {
         <input
           type="file"
           id="file"
-          className="*flex p-3
+          className="flex p-3
             rounded-lg
             bg-emerald-400
             text-black font-bold
@@ -41,7 +41,7 @@ export default function Home() {
         <button
           className={`p-3 bg-sky-300 hover:bg-sky-500 
           rounded-lg w-1/2 self-end text-black
-          font-bold transition origin-top
+          font-bold transition origin-top cursor-pointer
           ${file !== null ? "scale-y-100" : "scale-y-0"}`}
         >
           Submit
