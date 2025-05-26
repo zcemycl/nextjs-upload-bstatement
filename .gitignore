@@ -40,3 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 data/minio/.minio.sys
+part.*
+xl.meta
