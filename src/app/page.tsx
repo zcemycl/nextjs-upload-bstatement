@@ -1,19 +1,7 @@
 "use client";
 import { IClaudeResponse } from "@/types";
+import { fileToBase64 } from "@/utils";
 import { useState } from "react";
-
-function fileToBase64(file: File) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      // Remove the data URL prefix (data:application/pdf;base64,)
-      const base64 = (reader.result! as string).split(",")[1];
-      resolve(base64);
-    };
-    reader.onerror = (error) => reject(error);
-  });
-}
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
