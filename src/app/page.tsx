@@ -1,8 +1,32 @@
 "use client";
 import { useState } from "react";
 
+function fileToBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      // Remove the data URL prefix (data:application/pdf;base64,)
+      const base64 = (reader.result! as string).split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
+
+interface IContent {
+  name: string,
+  address: string,
+  date: string,
+  transactions: string[],
+  "starting-balance": number,
+  "ending-balance": number,
+}
+
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+  const [content, setContent] = useState<IContent | null>(null);
   return (
     <div
       className="w-screen h-screen 
@@ -43,9 +67,28 @@ export default function Home() {
           rounded-lg w-1/2 self-end text-black
           font-bold transition origin-top cursor-pointer
           ${file !== null ? "scale-y-100" : "scale-y-0"}`}
+          onClick={async (e) => {
+            e.preventDefault();
+            const base64 = await fileToBase64(file as File);
+            const resp = await fetch('/api/claude/sonnet4', {
+              method: "POST",
+              body: JSON.stringify({
+                payload: base64,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+            const payload = await resp.json();
+            setContent(payload as IContent);
+            console.log(payload);
+          }}
         >
           Submit
         </button>
+        {
+          content !== null && (<div>{JSON.stringify(content)}</div>)
+        }
       </div>
     </div>
   );
