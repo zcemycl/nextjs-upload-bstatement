@@ -18,9 +18,9 @@ export default function History({
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          'bucket-key': `${id}/content.json`
-        }
-      })
+          "bucket-key": `${id}/content.json`,
+        },
+      });
       const jsonData = await resp.json();
       console.log(jsonData);
       setContent(jsonData);
@@ -66,11 +66,12 @@ export default function History({
         "
       >
         <div className="w-full h-full relative">
-          <iframe 
+          <iframe
             // src={signedUrl}
             // sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            src={`/api/aws/file/${id}`} 
-            className="w-full h-full" />
+            src={`/api/aws/file/${id}`}
+            className="w-full h-full"
+          />
         </div>
 
         <div className="w-full p-5 space-y-2">

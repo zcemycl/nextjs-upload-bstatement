@@ -18,7 +18,7 @@ const s3 = new S3Client({
 
 export async function GET(request: Request) {
   const headers = request.headers;
-  const bucketKey = headers.get('bucket-key');
+  const bucketKey = headers.get("bucket-key");
   const command = new GetObjectCommand({
     Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
     Key: bucketKey as string,
