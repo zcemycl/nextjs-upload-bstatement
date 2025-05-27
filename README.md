@@ -16,6 +16,7 @@
    ```
 3. Run with docker compose.
    ```
-   docker compose up
+   docker compose --profile dev up # enable hot reload 1GB
+   docker compose --profile prod up # or without hot reload 228MB
    ```
 4. Test the app at `localhost:3000` with the PDF `Bank Statement Example Final.pdf` in the `resources` folder.

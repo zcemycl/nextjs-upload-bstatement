@@ -4,6 +4,8 @@ networks:
     name: upload_bstatement_net
 services:
   next:
+    profiles:
+      - dev
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -22,6 +24,24 @@ services:
     volumes:
       - ./src:/app/src
       - .:/app
+    networks:
+      - net
+  next-prod:
+    profiles:
+      - prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - NEXT_PUBLIC_S3_BUCKET_NAME=${NEXT_PUBLIC_S3_BUCKET_NAME}
+      - NEXT_PUBLIC_S3_SERVER_ENDPT_URL=${NEXT_PUBLIC_S3_SERVER_ENDPT_URL}
+      - NEXT_PUBLIC_S3_CLIENT_ENDPT_URL=${NEXT_PUBLIC_S3_CLIENT_ENDPT_URL}
+      - NEXT_PUBLIC_AWS_ACCESS_KEY_ID=${NEXT_PUBLIC_AWS_ACCESS_KEY_ID}
+      - NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY=${NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY}
+      - NEXT_PUBLIC_AWS_REGION=${NEXT_PUBLIC_AWS_REGION}
+    ports:
+      - 3000:3000
     networks:
       - net
   s3:

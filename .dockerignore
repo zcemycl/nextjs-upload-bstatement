@@ -1,2 +1,4 @@
 data
 resources
+node_modules
+.next
