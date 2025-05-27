@@ -1,8 +1,17 @@
 "use client";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components";
+import { useAnalysisToReport } from "@/hooks";
 
 export default function Home() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { content, submitFileToAnalysis } = useAnalysisToReport();
+  const myuuid = uuidv4();
+
   return (
     <div
       className="w-screen h-screen 
@@ -38,14 +47,29 @@ export default function Home() {
             console.log(e.target.files);
           }}
         />
-        <button
-          className={`p-3 bg-sky-300 hover:bg-sky-500 
+        <div
+          className="flex flex-row space-x-2 
+          justify-end content-center align-middle items-center"
+        >
+          <button
+            className={`p-3 bg-sky-300 hover:bg-sky-500 
           rounded-lg w-1/2 self-end text-black
           font-bold transition origin-top cursor-pointer
           ${file !== null ? "scale-y-100" : "scale-y-0"}`}
-        >
-          Submit
-        </button>
+            onClick={async (e) => {
+              e.preventDefault();
+              setIsLoading(true);
+              console.log(myuuid);
+              await submitFileToAnalysis(myuuid, file as File);
+              router.push(`/history/${myuuid}`);
+            }}
+          >
+            Submit
+          </button>
+          {isLoading && <Spinner />}
+        </div>
+
+        {content !== null && <div>{JSON.stringify(content)}</div>}
       </div>
     </div>
   );

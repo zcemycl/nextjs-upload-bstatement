@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+data/minio/.minio.sys
+part.*
+xl.meta

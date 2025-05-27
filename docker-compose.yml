@@ -1,0 +1,84 @@
+networks:
+  net:
+    driver: bridge
+    name: upload_bstatement_net
+services:
+  next:
+    profiles:
+      - dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - NEXT_PUBLIC_S3_BUCKET_NAME=${NEXT_PUBLIC_S3_BUCKET_NAME}
+      - NEXT_PUBLIC_S3_SERVER_ENDPT_URL=${NEXT_PUBLIC_S3_SERVER_ENDPT_URL}
+      - NEXT_PUBLIC_S3_CLIENT_ENDPT_URL=${NEXT_PUBLIC_S3_CLIENT_ENDPT_URL}
+      - NEXT_PUBLIC_AWS_ACCESS_KEY_ID=${NEXT_PUBLIC_AWS_ACCESS_KEY_ID}
+      - NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY=${NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY}
+      - NEXT_PUBLIC_AWS_REGION=${NEXT_PUBLIC_AWS_REGION}
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/app/src
+      - .:/app
+    networks:
+      - net
+  next-prod:
+    profiles:
+      - prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - NEXT_PUBLIC_S3_BUCKET_NAME=${NEXT_PUBLIC_S3_BUCKET_NAME}
+      - NEXT_PUBLIC_S3_SERVER_ENDPT_URL=${NEXT_PUBLIC_S3_SERVER_ENDPT_URL}
+      - NEXT_PUBLIC_S3_CLIENT_ENDPT_URL=${NEXT_PUBLIC_S3_CLIENT_ENDPT_URL}
+      - NEXT_PUBLIC_AWS_ACCESS_KEY_ID=${NEXT_PUBLIC_AWS_ACCESS_KEY_ID}
+      - NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY=${NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY}
+      - NEXT_PUBLIC_AWS_REGION=${NEXT_PUBLIC_AWS_REGION}
+    ports:
+      - 3000:3000
+    networks:
+      - net
+  s3:
+    restart: always
+    image: minio/minio
+    volumes:
+      # - ./src/minio_data/data:/data
+      - ./data/minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_ADDRESS: ":9000"
+      MINIO_PORT: "9000"
+      MINIO_STORAGE_USE_HTTPS: False
+      MINIO_CONSOLE_ADDRESS: ":9001"
+    command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://s3:9000/minio/health/live"]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+    networks:
+      - net
+
+  s3-populate:
+    image: minio/mc
+    depends_on:
+      s3:
+        condition: service_healthy
+    restart: on-failure:10
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set minio http://s3:9000 minioadmin minioadmin;
+      /usr/bin/mc mb minio/my-bucket;
+      "
+    networks:
+      - net
