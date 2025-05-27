@@ -8,6 +8,8 @@ COPY .husky/install.mjs ./.husky/
 RUN npm ci
 
 FROM base AS builder
+ARG NEXT_PUBLIC_S3_BUCKET_NAME
+ENV NEXT_PUBLIC_S3_BUCKET_NAME=$NEXT_PUBLIC_S3_BUCKET_NAME
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

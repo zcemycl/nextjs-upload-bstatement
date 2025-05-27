@@ -30,6 +30,8 @@ services:
     profiles:
       - prod
     build:
+      args:
+        NEXT_PUBLIC_S3_BUCKET_NAME: $NEXT_PUBLIC_S3_BUCKET_NAME
       context: .
       dockerfile: Dockerfile.prod
     environment:
