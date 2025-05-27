@@ -1,16 +1,15 @@
 "use client";
-import { IClaudeResponse } from "@/types";
-import { fileToBase64 } from "@/utils";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components";
+import { useAnalysisToReport } from "@/hooks";
 
 export default function Home() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [content, setContent] = useState<IClaudeResponse | null>(null);
+  const {content, submitFileToAnalysis} = useAnalysisToReport();
   const myuuid = uuidv4();
 
   return (
@@ -61,49 +60,7 @@ export default function Home() {
               e.preventDefault();
               setIsLoading(true);
               console.log(myuuid);
-              const base64 = await fileToBase64(file as File);
-
-              await fetch("/api/aws/s3", {
-                method: "POST",
-                body: JSON.stringify({
-                  uploadParams: {
-                    Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
-                    Key: `${myuuid}/document.pdf`, // e.g. 'reports/my-report.pdf'
-                    Body: "",
-                    ContentType: "application/pdf",
-                    ContentEncoding: "base64",
-                  },
-                  payload: base64,
-                  contentType: "application/pdf",
-                }),
-              });
-
-              const resp = await fetch("/api/claude/sonnet4", {
-                method: "POST",
-                body: JSON.stringify({
-                  payload: base64,
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              const payload = await resp.json();
-              setContent(payload as IClaudeResponse);
-              console.log(payload);
-
-              await fetch("/api/aws/s3", {
-                method: "POST",
-                body: JSON.stringify({
-                  uploadParams: {
-                    Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
-                    Key: `${myuuid}/content.json`,
-                    Body: "",
-                    ContentType: "application/json",
-                  },
-                  payload: JSON.stringify(payload),
-                  contentType: "application/json",
-                }),
-              });
+              await submitFileToAnalysis(myuuid, file as File);
               router.push(`/history/${myuuid}`);
             }}
           >

@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, use } from "react";
-import { IClaudeResponse } from "@/types";
+import { IClaudeResponse, ITransaction } from "@/types";
 
 export default function History({
   params,
@@ -11,6 +11,7 @@ export default function History({
   const { id } = use(params);
   const router = useRouter();
   const [content, setContent] = useState<IClaudeResponse | null>(null);
+  const [isValidate, setIsValidate] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -24,6 +25,14 @@ export default function History({
       const jsonData = await resp.json();
       console.log(jsonData);
       setContent(jsonData);
+      const transactionsSum = jsonData.transactions.map(
+        (v: ITransaction) => v.value).reduce(
+          (partialSum: number, a: number) => partialSum + a, 0);
+      console.log(jsonData?.["starting-balance"]+transactionsSum);
+      console.log(jsonData?.["ending-balance"]);
+      setIsValidate(
+        jsonData?.["starting-balance"]+transactionsSum === jsonData?.["ending-balance"]
+      )
     };
     getData();
   }, []);
@@ -123,15 +132,30 @@ export default function History({
             max-h-[33vh]
           "
           >
-            <span className="">Transactions: </span>
+            <span className="flex flex-row 
+              content-center items-center
+              space-x-2">
+              <p>Transactions: </p>
+              <div
+                className={
+                  `p-1 rounded-md ${isValidate ? 'bg-emerald-300' : 'bg-red-500'}`
+                }
+              >{isValidate ? 'Verified' : 'Not Valid'}</div>
+            </span>
             {content?.transactions.map((x, idx) => (
-              <h4
+              <span
                 className="px-1 text-black text-sm
-                  bg-amber-600 rounded-sm"
+                  bg-amber-600 rounded-sm
+                  flex flex-row justify-between
+                  content-center items-center"
                 key={`transaction-${idx}`}
               >
-                {x}
-              </h4>
+                <div className="basis-11/12">{x.title}</div>
+                <div className={`basis-1/12
+                  rounded-md p-1
+                  ${x.value > 0 ? 'bg-emerald-300' : 'bg-red-500'}
+                  `}>{x.value}</div>
+              </span>
             ))}
           </div>
         </div>
