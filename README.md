@@ -14,7 +14,7 @@
    ```
    ANTHROPIC_API_KEY=<please-use-your-key-here>
    ```
-3. For MacOS or Windows users who have Docker Desktop, please navigate to settings and file sharing, and add paths for, 
+3. For MacOS or Windows users who have Docker Desktop, please navigate to settings and file sharing, and add paths for,
    - `/data/minio`
    - `/src`
 4. Run with docker compose.
