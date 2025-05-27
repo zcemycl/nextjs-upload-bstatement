@@ -138,9 +138,7 @@ export default function Home() {
               "my-bucket",
               `${myuuid}/content.json`,
             );
-            router.push(
-              `/history/${myuuid}`
-            )
+            router.push(`/history/${myuuid}`);
           }}
         >
           Submit
