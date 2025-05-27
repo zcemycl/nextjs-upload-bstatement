@@ -45,7 +45,7 @@ export default function History({
           Hello, Document {id}&apos;s Details
         </h1>
         <button
-          className="fit 
+          className="fit cursor-pointer
         bg-sky-400 hover:bg-sky-600 
         rounded-lg p-2 text-black
         font-bold self-start"
@@ -126,7 +126,7 @@ export default function History({
             <span className="">Transactions: </span>
             {content?.transactions.map((x, idx) => (
               <h4
-                className="px-1 text-black text-xl
+                className="px-1 text-black text-sm
                   bg-amber-600 rounded-sm"
                 key={`transaction-${idx}`}
               >

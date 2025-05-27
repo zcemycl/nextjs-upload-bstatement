@@ -13,7 +13,7 @@ const s3 = new S3Client({
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   console.log(id);

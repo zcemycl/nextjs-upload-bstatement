@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const data = await request.json();
-  let uploadParams = data.uploadParams as PutObjectCommandInput;
+  // let uploadParams = data.uploadParams as PutObjectCommandInput;
   const payload = data.payload;
   const contentType = data.contentType;
   let body;
@@ -48,7 +48,11 @@ export async function POST(request: Request) {
   } else {
     body = payload;
   }
-  uploadParams.Body = body;
+  const uploadParams = {
+    ...data.uploadParams,
+    Body: body,
+  } as PutObjectCommandInput;
+  // uploadParams.Body = body;
 
   const command = new PutObjectCommand(uploadParams);
   let response;
