@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { S3Client, PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
   region: process.env.NEXT_PUBLIC_AWS_REGION, // replace with your region
@@ -32,13 +36,13 @@ export async function POST(request: Request) {
 
   const command = new PutObjectCommand(uploadParams);
   let response;
-    try {
-      response = await s3.send(command);
-      console.log("Upload successful:", response);
-    } catch (err) {
-      console.error("Error uploading file:", err);
-      throw err;
-    }
+  try {
+    response = await s3.send(command);
+    console.log("Upload successful:", response);
+  } catch (err) {
+    console.error("Error uploading file:", err);
+    throw err;
+  }
 
-  return NextResponse.json({ msg: 'successful'}, { status: 200 });
+  return NextResponse.json({ msg: "successful" }, { status: 200 });
 }
