@@ -15,7 +15,11 @@ const s3 = new S3Client({
   },
 });
 
-export default function History({params} :  { params: Promise<{ id: string }> }) {
+export default function History({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const [signedUrl, setSignedUrl] = useState("");
@@ -37,54 +41,77 @@ export default function History({params} :  { params: Promise<{ id: string }> })
       });
       const response = await s3.send(commandContent);
       const bodyText = await response.Body!.transformToString();
-      console.log(bodyText)
+      console.log(bodyText);
       const jsonData = JSON.parse(bodyText);
       console.log(jsonData);
       setContent(jsonData);
-
-    }
+    };
     getData();
-    
-  }, [])
+  }, []);
 
-  return <div className="
+  return (
+    <div
+      className="
     w-screen h-screen
-    p-10 flex flex-col space-y-2">
-    <h1 className="flex basis-1/12 self-start 
+    p-10 flex flex-col space-y-2"
+    >
+      <h1
+        className="flex basis-1/12 self-start 
       text-2xl w-full align-middle items-center
-      content-center">Hello, Document {id}'s Details</h1>
-    <div className="flex flex-row basis-11/12 space-x-2">
+      content-center"
+      >
+        Hello, Document {id}'s Details
+      </h1>
+      <div className="flex flex-row basis-11/12 space-x-2">
         <div className="w-full h-full relative">
-          {
-            signedUrl !== "" && (
-              <iframe src={signedUrl}
-                className="w-full h-full"/>
-            )
-          }
+          {signedUrl !== "" && (
+            <iframe src={signedUrl} className="w-full h-full" />
+          )}
         </div>
-       
+
         <div className="w-full p-5 space-y-2">
-          <h4 className="bg-amber-500 
+          <h4
+            className="bg-amber-500 
             text-black
             rounded-md px-2 py-1
-            text-2xl">Name: {content?.name}</h4>
-          <h4 className="bg-amber-500 
+            text-2xl"
+          >
+            Name: {content?.name}
+          </h4>
+          <h4
+            className="bg-amber-500 
             text-black
             rounded-md px-2 py-1
-            text-2xl">Address: {content?.address}</h4>
-          <h4 className="bg-amber-500 
+            text-2xl"
+          >
+            Address: {content?.address}
+          </h4>
+          <h4
+            className="bg-amber-500 
             text-black
             rounded-md px-2 py-1
-            text-2xl">Date: {content?.date}</h4>
-          <h4 className="bg-amber-500 
+            text-2xl"
+          >
+            Date: {content?.date}
+          </h4>
+          <h4
+            className="bg-amber-500 
             text-black
             rounded-md px-2 py-1
-            text-2xl">Starting Balance: {content?.["starting-balance"]}</h4>
-          <h4 className="bg-amber-500 
+            text-2xl"
+          >
+            Starting Balance: {content?.["starting-balance"]}
+          </h4>
+          <h4
+            className="bg-amber-500 
             text-black
             rounded-md px-2 py-1
-            text-2xl">Ending Balance: {content?.["ending-balance"]}</h4>
+            text-2xl"
+          >
+            Ending Balance: {content?.["ending-balance"]}
+          </h4>
         </div>
+      </div>
     </div>
-  </div>;
+  );
 }
