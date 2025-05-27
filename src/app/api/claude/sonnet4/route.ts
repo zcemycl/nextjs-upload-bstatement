@@ -54,6 +54,6 @@ export async function POST(request: Request) {
       },
     ],
   });
-  const jsonstring = (message.content[0] as {text: string}).text;
+  const jsonstring = (message.content[0] as { text: string }).text;
   return NextResponse.json(JSON.parse(jsonstring), { status: 200 });
 }
