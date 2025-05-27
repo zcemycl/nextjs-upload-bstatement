@@ -1,19 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, use } from "react";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { IClaudeResponse } from "@/types";
-
-const s3 = new S3Client({
-  region: process.env.NEXT_PUBLIC_AWS_REGION, // replace with your region
-  endpoint: process.env.NEXT_PUBLIC_S3_ENDPT_URL, // 👈 Your MinIO server URL
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY as string,
-  },
-});
 
 export default function History({
   params,
@@ -22,27 +10,18 @@ export default function History({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const [signedUrl, setSignedUrl] = useState("");
   const [content, setContent] = useState<IClaudeResponse | null>(null);
 
   useEffect(() => {
     const getData = async () => {
-      const command = new GetObjectCommand({
-        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-        Key: `${id}/document.pdf`,
-      });
-      const url = await getSignedUrl(s3, command, { expiresIn: 300 });
-      console.log(url);
-      setSignedUrl(url);
-
-      const commandContent = new GetObjectCommand({
-        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-        Key: `${id}/content.json`,
-      });
-      const response = await s3.send(commandContent);
-      const bodyText = await response.Body!.transformToString();
-      console.log(bodyText);
-      const jsonData = JSON.parse(bodyText);
+      const resp = await fetch("/api/aws/s3", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          'bucket-key': `${id}/content.json`
+        }
+      })
+      const jsonData = await resp.json();
       console.log(jsonData);
       setContent(jsonData);
     };
@@ -87,9 +66,11 @@ export default function History({
         "
       >
         <div className="w-full h-full relative">
-          {signedUrl !== "" && (
-            <iframe src={signedUrl} className="w-full h-full" />
-          )}
+          <iframe 
+            // src={signedUrl}
+            // sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            src={`/api/aws/file/${id}`} 
+            className="w-full h-full" />
         </div>
 
         <div className="w-full p-5 space-y-2">
