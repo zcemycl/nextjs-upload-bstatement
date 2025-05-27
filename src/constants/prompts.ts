@@ -20,4 +20,4 @@ Answer this with ONLY a structured json of a given interface below,
 }
 `;
 
-export {prompt};
+export { prompt };
