@@ -10,7 +10,7 @@ export default function History({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const {content, isValidate, isLoading} = useReportHistory({id});
+  const { content, isValidate, isLoading } = useReportHistory({ id });
 
   return (
     <div
@@ -18,7 +18,7 @@ export default function History({
         w-screen h-screen
         p-2 sm:p-10 
         flex flex-col space-y-2
-        ${isLoading ? 'animate-pulse': ''}
+        ${isLoading ? "animate-pulse" : ""}
     `}
     >
       <div className="flex flex-col justify-start">
