@@ -19,7 +19,7 @@ Answer this with ONLY a structured json of a given interface below,
 "date": string,
 "transactions": string[],
 "starting-balance": number,
-"ending balance": number,
+"ending-balance": number,
 }
 `;
 
