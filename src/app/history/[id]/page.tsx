@@ -53,16 +53,36 @@ export default function History({
     <div
       className="
     w-screen h-screen
-    p-10 flex flex-col space-y-2"
+    p-2 sm:p-10 
+    flex flex-col space-y-2
+    "
     >
+      <div className="flex flex-col justify-start">
       <h1
         className="flex basis-1/12 self-start 
       text-2xl w-full align-middle items-center
       content-center"
       >
-        Hello, Document {id}'s Details
+        Hello, Document {id}&apos;s Details
       </h1>
-      <div className="flex flex-row basis-11/12 space-x-2">
+      <button className="fit 
+        bg-sky-400 hover:bg-sky-600 
+        rounded-lg p-2 text-black
+        font-bold self-start"
+        onClick={(e) => {
+          e.preventDefault();
+          router.back();
+        }}
+        >
+        Back        
+      </button>
+      </div>
+      
+      <div className="flex basis-10/12
+        flex-col sm:flex-row
+        space-y-2 sm:space-y-0
+        space-x-0 sm:space-x-2
+        ">
         <div className="w-full h-full relative">
           {signedUrl !== "" && (
             <iframe src={signedUrl} className="w-full h-full" />
@@ -110,6 +130,24 @@ export default function History({
           >
             Ending Balance: {content?.["ending-balance"]}
           </h4>
+          <div className="flex flex-col space-y-2
+            bg-amber-500 rounded-md px-2 py-1
+            overflow-y-auto
+            text-black text-2xl
+            max-h-[33vh]
+          ">
+            <span className="">Transactions: </span>
+            {
+              content?.transactions.map((x, idx) => (
+                <h4 className="px-1 text-black text-xl
+                  bg-amber-600 rounded-sm"
+                  key={`transaction-${idx}`}
+                  >
+                  {x}
+                </h4>
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { fileToBase64 } from "@/utils";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { useRouter } from "next/navigation";
 
 const s3 = new S3Client({
   region: "eu-west-2", // replace with your region
@@ -65,6 +66,7 @@ export async function uploadPdfToS3(
 }
 
 export default function Home() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [content, setContent] = useState<IClaudeResponse | null>(null);
   const myuuid = uuidv4();
@@ -136,6 +138,9 @@ export default function Home() {
               "my-bucket",
               `${myuuid}/content.json`,
             );
+            router.push(
+              `/history/${myuuid}`
+            )
           }}
         >
           Submit
