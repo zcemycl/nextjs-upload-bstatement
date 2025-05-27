@@ -1,6 +1,6 @@
 interface ITransaction {
-  title: string,
-  value: number,
+  title: string;
+  value: number;
 }
 
 interface IClaudeResponse {

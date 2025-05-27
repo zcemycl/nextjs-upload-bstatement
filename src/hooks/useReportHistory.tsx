@@ -1,5 +1,3 @@
-const useReportHistory = () => {
+const useReportHistory = () => {};
 
-}
-
-export {useReportHistory};
+export { useReportHistory };

@@ -9,7 +9,7 @@ export default function Home() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const {content, submitFileToAnalysis} = useAnalysisToReport();
+  const { content, submitFileToAnalysis } = useAnalysisToReport();
   const myuuid = uuidv4();
 
   return (

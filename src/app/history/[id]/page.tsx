@@ -25,14 +25,15 @@ export default function History({
       const jsonData = await resp.json();
       console.log(jsonData);
       setContent(jsonData);
-      const transactionsSum = jsonData.transactions.map(
-        (v: ITransaction) => v.value).reduce(
-          (partialSum: number, a: number) => partialSum + a, 0);
-      console.log(jsonData?.["starting-balance"]+transactionsSum);
+      const transactionsSum = jsonData.transactions
+        .map((v: ITransaction) => v.value)
+        .reduce((partialSum: number, a: number) => partialSum + a, 0);
+      console.log(jsonData?.["starting-balance"] + transactionsSum);
       console.log(jsonData?.["ending-balance"]);
       setIsValidate(
-        jsonData?.["starting-balance"]+transactionsSum === jsonData?.["ending-balance"]
-      )
+        jsonData?.["starting-balance"] + transactionsSum ===
+          jsonData?.["ending-balance"],
+      );
     };
     getData();
   }, []);
@@ -132,15 +133,17 @@ export default function History({
             max-h-[33vh]
           "
           >
-            <span className="flex flex-row 
+            <span
+              className="flex flex-row 
               content-center items-center
-              space-x-2">
+              space-x-2"
+            >
               <p>Transactions: </p>
               <div
-                className={
-                  `p-1 rounded-md ${isValidate ? 'bg-emerald-300' : 'bg-red-500'}`
-                }
-              >{isValidate ? 'Verified' : 'Not Valid'}</div>
+                className={`p-1 rounded-md ${isValidate ? "bg-emerald-300" : "bg-red-500"}`}
+              >
+                {isValidate ? "Verified" : "Not Valid"}
+              </div>
             </span>
             {content?.transactions.map((x, idx) => (
               <span
@@ -151,10 +154,14 @@ export default function History({
                 key={`transaction-${idx}`}
               >
                 <div className="basis-11/12">{x.title}</div>
-                <div className={`basis-1/12
+                <div
+                  className={`basis-1/12
                   rounded-md p-1
-                  ${x.value > 0 ? 'bg-emerald-300' : 'bg-red-500'}
-                  `}>{x.value}</div>
+                  ${x.value > 0 ? "bg-emerald-300" : "bg-red-500"}
+                  `}
+                >
+                  {x.value}
+                </div>
               </span>
             ))}
           </div>
