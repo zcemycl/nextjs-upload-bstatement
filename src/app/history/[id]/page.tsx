@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, use } from "react";
-import { IClaudeResponse, ITransaction } from "@/types";
+import { use } from "react";
+import { useReportHistory } from "@/hooks";
 
 export default function History({
   params,
@@ -10,41 +10,16 @@ export default function History({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const [content, setContent] = useState<IClaudeResponse | null>(null);
-  const [isValidate, setIsValidate] = useState(false);
-
-  useEffect(() => {
-    const getData = async () => {
-      const resp = await fetch("/api/aws/s3", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "bucket-key": `${id}/content.json`,
-        },
-      });
-      const jsonData = await resp.json();
-      console.log(jsonData);
-      setContent(jsonData);
-      const transactionsSum = jsonData.transactions
-        .map((v: ITransaction) => v.value)
-        .reduce((partialSum: number, a: number) => partialSum + a, 0);
-      console.log(jsonData?.["starting-balance"] + transactionsSum);
-      console.log(jsonData?.["ending-balance"]);
-      setIsValidate(
-        jsonData?.["starting-balance"] + transactionsSum ===
-          jsonData?.["ending-balance"],
-      );
-    };
-    getData();
-  }, []);
+  const {content, isValidate, isLoading} = useReportHistory({id});
 
   return (
     <div
-      className="
-    w-screen h-screen
-    p-2 sm:p-10 
-    flex flex-col space-y-2
-    "
+      className={`
+        w-screen h-screen
+        p-2 sm:p-10 
+        flex flex-col space-y-2
+        ${isLoading ? 'animate-pulse': ''}
+    `}
     >
       <div className="flex flex-col justify-start">
         <h1
