@@ -6,12 +6,12 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { IClaudeResponse } from "@/types";
 
 const s3 = new S3Client({
-  region: "eu-west-2", // replace with your region
-  endpoint: "http://localhost:9000", // 👈 Your MinIO server URL
+  region: process.env.NEXT_PUBLIC_AWS_REGION, // replace with your region
+  endpoint: process.env.NEXT_PUBLIC_S3_ENDPT_URL, // 👈 Your MinIO server URL
   forcePathStyle: true,
   credentials: {
-    accessKeyId: "minioadmin",
-    secretAccessKey: "minioadmin",
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY as string,
   },
 });
 
@@ -28,7 +28,7 @@ export default function History({
   useEffect(() => {
     const getData = async () => {
       const command = new GetObjectCommand({
-        Bucket: "my-bucket",
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
         Key: `${id}/document.pdf`,
       });
       const url = await getSignedUrl(s3, command, { expiresIn: 300 });
@@ -36,7 +36,7 @@ export default function History({
       setSignedUrl(url);
 
       const commandContent = new GetObjectCommand({
-        Bucket: "my-bucket",
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
         Key: `${id}/content.json`,
       });
       const response = await s3.send(commandContent);

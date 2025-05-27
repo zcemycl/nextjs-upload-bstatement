@@ -7,12 +7,12 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { useRouter } from "next/navigation";
 
 const s3 = new S3Client({
-  region: "eu-west-2", // replace with your region
-  endpoint: "http://localhost:9000", // 👈 Your MinIO server URL
+  region: process.env.NEXT_PUBLIC_AWS_REGION, // replace with your region
+  endpoint: process.env.NEXT_PUBLIC_S3_ENDPT_URL, // 👈 Your MinIO server URL
   forcePathStyle: true,
   credentials: {
-    accessKeyId: "minioadmin",
-    secretAccessKey: "minioadmin",
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY as string,
   },
 });
 
@@ -117,7 +117,7 @@ export default function Home() {
             const base64 = await fileToBase64(file as File);
             await uploadPdfToS3(
               base64 as string,
-              "my-bucket",
+              process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
               `${myuuid}/document.pdf`,
             );
 
@@ -135,7 +135,7 @@ export default function Home() {
             console.log(payload);
             await uploadJsonToS3(
               payload,
-              "my-bucket",
+              process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
               `${myuuid}/content.json`,
             );
             router.push(`/history/${myuuid}`);
