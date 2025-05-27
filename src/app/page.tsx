@@ -3,71 +3,13 @@ import { IClaudeResponse } from "@/types";
 import { fileToBase64 } from "@/utils";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { useRouter } from "next/navigation";
-
-const s3 = new S3Client({
-  region: process.env.NEXT_PUBLIC_AWS_REGION, // replace with your region
-  endpoint: process.env.NEXT_PUBLIC_S3_ENDPT_URL, // 👈 Your MinIO server URL
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY as string,
-  },
-});
-
-export async function uploadJsonToS3(
-  payload: string,
-  bucket: string,
-  key: string,
-) {
-  const uploadParams = {
-    Bucket: bucket,
-    Key: key, // e.g. 'reports/my-report.pdf'
-    Body: JSON.stringify(payload),
-    ContentType: "application/json",
-  };
-  const command = new PutObjectCommand(uploadParams);
-  try {
-    const response = await s3.send(command);
-    console.log("Upload successful:", response);
-    return response;
-  } catch (err) {
-    console.error("Error uploading file:", err);
-    throw err;
-  }
-}
-
-export async function uploadPdfToS3(
-  base64Data: string,
-  bucket: string,
-  key: string,
-) {
-  // Convert to Buffer
-  const pdfBuffer = Buffer.from(base64Data, "base64");
-
-  const uploadParams = {
-    Bucket: bucket,
-    Key: key, // e.g. 'reports/my-report.pdf'
-    Body: pdfBuffer,
-    ContentType: "application/pdf",
-    ContentEncoding: "base64",
-  };
-
-  const command = new PutObjectCommand(uploadParams);
-  try {
-    const response = await s3.send(command);
-    console.log("Upload successful:", response);
-    return response;
-  } catch (err) {
-    console.error("Error uploading file:", err);
-    throw err;
-  }
-}
+import { Spinner } from "@/components";
 
 export default function Home() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState<IClaudeResponse | null>(null);
   const myuuid = uuidv4();
 
@@ -106,6 +48,8 @@ export default function Home() {
             console.log(e.target.files);
           }}
         />
+        <div className="flex flex-row space-x-2 
+          justify-end content-center align-middle items-center">
         <button
           className={`p-3 bg-sky-300 hover:bg-sky-500 
           rounded-lg w-1/2 self-end text-black
@@ -113,13 +57,24 @@ export default function Home() {
           ${file !== null ? "scale-y-100" : "scale-y-0"}`}
           onClick={async (e) => {
             e.preventDefault();
+            setIsLoading(true);
             console.log(myuuid);
             const base64 = await fileToBase64(file as File);
-            await uploadPdfToS3(
-              base64 as string,
-              process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
-              `${myuuid}/document.pdf`,
-            );
+
+            await fetch("/api/aws/s3", {
+              method: "POST",
+              body: JSON.stringify({
+                uploadParams: {
+                  Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
+                  Key: `${myuuid}/document.pdf`, // e.g. 'reports/my-report.pdf'
+                  Body: "",
+                  ContentType: "application/pdf",
+                  ContentEncoding: "base64",
+                },
+                payload: base64,
+                contentType: "application/pdf",
+              })
+            })
 
             const resp = await fetch("/api/claude/sonnet4", {
               method: "POST",
@@ -133,16 +88,32 @@ export default function Home() {
             const payload = await resp.json();
             setContent(payload as IClaudeResponse);
             console.log(payload);
-            await uploadJsonToS3(
-              payload,
-              process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
-              `${myuuid}/content.json`,
-            );
+
+            await fetch("/api/aws/s3", {
+              method: "POST",
+              body: JSON.stringify({
+                uploadParams: {
+                  Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME as string,
+                  Key: `${myuuid}/content.json`,
+                  Body: "",
+                  ContentType: "application/json",
+                },
+                payload: JSON.stringify(payload),
+                contentType: "application/json",
+              })
+            })
             router.push(`/history/${myuuid}`);
           }}
         >
           Submit
         </button>
+        {
+          isLoading && (
+            <Spinner/>
+          )
+        }
+        </div>
+        
         {content !== null && <div>{JSON.stringify(content)}</div>}
       </div>
     </div>
